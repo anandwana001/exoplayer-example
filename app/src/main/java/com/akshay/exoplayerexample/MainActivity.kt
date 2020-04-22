@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
+import com.akshay.exoplayerexample.util.Constants
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.ExoPlayerFactory
 import com.google.android.exoplayer2.Player
@@ -21,11 +22,6 @@ import kotlinx.android.synthetic.main.activity_main.*
 class MainActivity : AppCompatActivity() {
 
     private var simpleExoPlayer: SimpleExoPlayer? = null
-    private val mp3Url = "https://storage.googleapis.com/exoplayer-test-media-0/Jazz_In_Paris.mp3"
-    private val mp4Url =
-        "https://storage.googleapis.com/exoplayer-test-media-0/BigBuckBunny_320x180.mp4"
-    private val dashUrl =
-        "https://www.youtube.com/api/manifest/dash/id/bf5bb2419360daf1/source/youtube?as=fmp4_audio_clear,fmp4_sd_hd_clear&sparams=ip,ipbits,expire,source,id,as&ip=0.0.0.0&ipbits=0&expire=19000000000&signature=51AF5F39AB0CEC3E5497CD9C900EBFEAECCCB5C7.8506521BFC350652163895D4C26DEE124209AA9E&key=ik0"
     private var playWhenReady = true
     private var currentWindow = 0
     private var playbackPosition: Long = 0
@@ -44,7 +40,7 @@ class MainActivity : AppCompatActivity() {
         simpleExoPlayer = ExoPlayerFactory.newSimpleInstance(this)
         simpleExoPlayer?.let {
             playerView.player = simpleExoPlayer
-            val mediaSource = buildMediaSource()
+            val mediaSource = buildMediaSource(Constants.MP3_URL)
             it.addListener(playbackStateListener)
             it.setPlayWhenReady(playWhenReady)
             it.seekTo(currentWindow, playbackPosition)
@@ -52,11 +48,11 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun buildMediaSource(): MediaSource {
+    private fun buildMediaSource(url: String): MediaSource {
         val dataSourceFactory = DefaultDataSourceFactory(this, "sample_exoplayer")
         return ProgressiveMediaSource.Factory(
             dataSourceFactory
-        ).createMediaSource(Uri.parse(mp3Url))
+        ).createMediaSource(Uri.parse(url))
     }
 
     private fun hideSystemUi() {
