@@ -10,7 +10,6 @@ import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import com.akshay.exoplayerexample.util.Constants
 import com.google.android.exoplayer2.ExoPlayer
-import com.google.android.exoplayer2.ExoPlayerFactory
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.source.MediaSource
@@ -37,7 +36,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initializeExoPlayer() {
-        simpleExoPlayer = ExoPlayerFactory.newSimpleInstance(this)
+        simpleExoPlayer = SimpleExoPlayer.Builder(this).build()
         simpleExoPlayer?.let {
             playerView.player = simpleExoPlayer
             val mediaSource = buildMediaSource(Constants.MP3_URL)
