@@ -2,4 +2,5 @@
     <string name="app_name">Exoplayer Example</string>
     <string name="title_player_lib">player-lib</string>
     <string name="basic_audio_player">Basic Audio Player</string>
+    <string name="handling_basic_audio_player">Handling Basic Audio Player</string>
 </resources>
