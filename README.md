@@ -17,13 +17,16 @@ Built with Android Architecture Components. ExoPlayer support DASH and SmoothStr
  * Widevine common encryption
  * Interactive Media Ads SDK
 
- ## Supported Device
+## Supported Device
  * FireOS (version 4 and earlier)
  * Nexus Player (only when using an HDMI to DVI cable)
  * Emulators (system image has an API level of at least 23)
 
 
- ## What is DASH
+## How does ExoPlayer works under the hood
 
 
- ## What is SmoothStreaming
+## What is DASH
+
+
+## What is SmoothStreaming
