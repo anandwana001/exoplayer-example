@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Exoplayer Example</string>
+    <string name="title_player_lib">player-lib</string>
+</resources>
