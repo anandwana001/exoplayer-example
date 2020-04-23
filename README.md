@@ -40,13 +40,13 @@ Built with Android Architecture Components. ExoPlayer support DASH and SmoothStr
 * TextRenderer
 * MetadataRenderer
 
-## Type of TrackSelector
+### Type of TrackSelector
 * DefaultTrackSelector
 
-## Type of LoadControl
+### Type of LoadControl
 * DefaultLoadControl
 
-## Threading Model
+### Threading Model
 ![](https://exoplayer.dev/doc/reference/com/google/android/exoplayer2/doc-files/exoplayer-threading-model.svg)
 
 Application thread for ExoPlayer instance must be use. Needed for ExoPlayer's UI components or the IMA extension. Looper can be accessed using `Player.getApplicationLooper()`. Listener also work on same thread. Internal thread for playback.
