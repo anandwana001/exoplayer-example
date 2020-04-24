@@ -75,6 +75,24 @@ Application thread for ExoPlayer instance must be use. Needed for ExoPlayer's UI
 
 
 ## What is DASH
+Dynamic Adaptive Streaming over HTTP (DASH) so what is Adaptive Streaming first?
+Also known as Adaptive Bitrate Streaming, (bitrate - speed of the internet connection) it is a technique to stream multimedia. What it does differently is it detect's the user bandwidth and machine capacity and adjust the media quality based on it.
 
+![](https://upload.wikimedia.org/wikipedia/commons/4/4b/Adaptive_streaming_overview_daseddon_2011_07_28.png)
+Encoder encodes the single media file in multiple bit rates and this result in less buffereing and fast start time.
+
+**Let's understand the problem**
+Earlier days we have something called progressive streaming. Let's understand this with an example.
+Suppose we have a video file 1280*720px on our server. People with different screen resolution, sizes will now stream this video.
+1. Screen with 1920*1080px, video is too small
+2. Screen with 1280*720px, video will play ok
+3. Screen with 854*480px, video is too large<br>
+
+Second problem is **Buffering**
+Video provider creates file according to the screen size. This solves the first problem. For Slow and Fast internet, adaptive video stream switch to lower file type which will give user no buffering situation in slow internet. Encoder broke the video in multiple segments of 2-4secs long, and at the end of a segment based on user bandwidth, segment can be switch to lower or upper quality.
+
+
+**Dynamic Adaptive Streaming over HTTP also known as MPEG-DASH**, the media file broken into the multiple segments and are provided over HTTP. This uses bit rate adaptation (ABR) algorithm.<br>
+There are `.mpd` files, MPEG-DASH Media Presentation Description, which consist of Period which has information of different view angles or with different codecs, audio components for different languages or with different types of information, subtitle or caption components and much more in deep.
 
 ## What is SmoothStreaming
