@@ -6,4 +6,5 @@
     <string name="basic_audio_player_with_listener">Basic Audio Player with Listener</string>
     <string name="basic_audio_player_with_dash_media_source">Basic Audio Player with DASH Media Source</string>
     <string name="basic_audio_player_with_smooth_streaming">Basic Audio Player with Smooth Streaming</string>
+    <string name="basic_audio_player_with_hls_media_source">Basic Audio Player with HLS Media Source</string>
 </resources>

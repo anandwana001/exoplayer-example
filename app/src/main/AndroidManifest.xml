@@ -11,7 +11,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ui.BasicAudioPlayerWithSmoothStreaming">
+        <activity android:name=".ui.BasicAudioPlayerWithHLSMediaSource">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -23,6 +23,7 @@
         <activity android:name=".ui.HandlingBasicAudioPlayer" />
         <activity android:name=".ui.BasicAudioPlayerWithListener" />
         <activity android:name=".ui.BasicAudioPlayerWithDashMediaSource" />
+        <activity android:name=".ui.BasicAudioPlayerWithSmoothStreaming" />
     </application>
 
 </manifest>

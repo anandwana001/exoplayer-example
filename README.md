@@ -98,3 +98,9 @@ There are `.mpd` files, MPEG-DASH Media Presentation Description, which consist 
 ## What is SmoothStreaming
 Smooth Streaming seems like streaming but it is HTTP progressive download. This is developed by Microsoft.
 ![](https://1yy04i3k9fyt3vqjsf2mv610yvm-wpengine.netdna-ssl.com/wp-content/uploads/2015/07/EDC_MSS-84.png)
+
+## What is HLS
+HTTP Live Streaming by Apple, is a media streaming protocol to deliver content across internet. `M3U` (or `M3U8`) is a plain text file format developed to organize mp3 files. Two type of M3U8 file,
+ * Master playlist - URLs to media playlists
+ * Media playlist - URLs of the files (chunks) needed for streaming
+![](https://miro.medium.com/max/1400/1*BSsL6uEf5UKLH_u7j0mckw.png)
