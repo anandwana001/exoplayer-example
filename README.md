@@ -96,3 +96,5 @@ Video provider creates file according to the screen size. This solves the first 
 There are `.mpd` files, MPEG-DASH Media Presentation Description, which consist of Period which has information of different view angles or with different codecs, audio components for different languages or with different types of information, subtitle or caption components and much more in deep.
 
 ## What is SmoothStreaming
+Smooth Streaming seems like streaming but it is HTTP progressive download. This is developed by Microsoft.
+![](https://1yy04i3k9fyt3vqjsf2mv610yvm-wpengine.netdna-ssl.com/wp-content/uploads/2015/07/EDC_MSS-84.png)
