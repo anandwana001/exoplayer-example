@@ -35,6 +35,10 @@ object Constants {
         "https://playready.directtaps.net/smoothstreaming/SSWSS720H264/SuperSpeedway_720.ism/Manifest"
     val HLS_URL =
         "https://devstreaming-cdn.apple.com/videos/streaming/examples/img_bipbop_adv_example_ts/master.m3u8"
+    val MP4_WITH_SUBTITLE_URL =
+        "http://www.storiesinflight.com/js_videosub/jellies.mp4"
+    val SUBTITLE_URL =
+        "http://www.storiesinflight.com/js_videosub/jellies.srt"
 
     fun uriParser(url: String): Uri {
         return Uri.parse(url)

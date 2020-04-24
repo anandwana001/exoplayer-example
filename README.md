@@ -71,7 +71,9 @@ Application thread for ExoPlayer instance must be use. Needed for ExoPlayer's UI
  * `EventLogger:`**`tracks`**`[eventTime=2.22, mediaPos=0.00, window=0, period=0, []]`<br>
  * `EventLogger:`**`isPlaying`**`[eventTime=2.37, mediaPos=0.00, window=0, period=0, true]`<br>
 
-## ConcatenatingMediaSource
+## Advanced Media Source
+
+### ConcatenatingMediaSource
 Helps to create heterogeneous playlist
 `ConcatenatingMediaSource(mediaSource1, mediaSource2, mediaSource1, mediaSource2)`
 
@@ -81,6 +83,18 @@ Tags when item changes in playlist
  * `Player.TIMELINE_CHANGE_REASON_DYNAMIC` - when item added, removed or moved
 
 `getCurrentTag()` - To check which items in playling on the player.
+
+### MergingMediaSource
+`MergingMediaSource(mediaSource, subtitleSource)`
+The Timeline of the sources being merged must have the same number of periods. Mostly use to merge video with their subtitles.
+
+### LoopingMediaSource
+`LoopingMediaSource(mediaSource, 2)`
+Pass the loop count and this will loop the given media source that number of times.
+
+### ClippingMediaSource
+`ClippingMediaSource(mediaSource, 120000000, 150000000)`
+Pass the media source and start and end position in microseconds from where you have to clip the video.
 
 ## How does ExoPlayer works under the hood
 

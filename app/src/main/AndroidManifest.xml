@@ -10,8 +10,9 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
+        android:usesCleartextTraffic="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ui.BasiAudioPlayerWithPlaylist">
+        <activity android:name=".ui.BasicAudioPlayerWithClipLoopMerge">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -26,6 +27,7 @@
         <activity android:name=".ui.BasicAudioPlayerWithSmoothStreaming" />
         <activity android:name=".ui.BasicAudioPlayerWithHLSMediaSource" />
         <activity android:name=".ui.BasicAudioPlayerWithProgressiveMediaSource" />
+        <activity android:name=".ui.BasiAudioPlayerWithPlaylist" />
     </application>
 
 </manifest>
