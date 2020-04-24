@@ -11,7 +11,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ui.HandlingBasicAudioPlayer">
+        <activity android:name=".ui.BasicAudioPlayerWithListener">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -20,6 +20,7 @@
         </activity>
         <activity android:name=".MainActivity" />
         <activity android:name=".ui.BasicAudioPlayer" />
+        <activity android:name=".ui.HandlingBasicAudioPlayer" />
     </application>
 
 </manifest>

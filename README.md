@@ -51,6 +51,26 @@ Built with Android Architecture Components. ExoPlayer support DASH and SmoothStr
 
 Application thread for ExoPlayer instance must be use. Needed for ExoPlayer's UI components or the IMA extension. Looper can be accessed using `Player.getApplicationLooper()`. Listener also work on same thread. Internal thread for playback.
 
+## Player States
+ * ExoPlayer.STATE_IDLE
+ * ExoPlayer.STATE_BUFFERING
+ * ExoPlayer.STATE_READY
+ * ExoPlayer.STATE_ENDED
+
+## EventLogger
+ * `EventLogger:`**`state`**`[eventTime=0.10, mediaPos=0.00, window=0, true, IDLE]`<br>
+ * `EventLogger:`**`seekStarted`**`[eventTime=0.10, mediaPos=0.00, window=0]`<br>
+ * `EventLogger:`**`positionDiscontinuity`**`[eventTime=0.10, mediaPos=0.00, window=0, SEEK]`<br>
+ * `EventLogger:`**`timeline`**`[eventTime=0.16, mediaPos=0.00, window=0, periodCount=1, windowCount=1, reason=PREPARED
+    period [?]
+    window [?, false, false]
+]`<br>
+ * `EventLogger:`**`seekProcessed`**`[eventTime=0.16, mediaPos=0.00, window=0]`<br>
+ * `EventLogger:`**`surfaceSize`**`[eventTime=0.25, mediaPos=0.00, window=0, 1080, 792]`<br>
+ * `EventLogger:`**`loading`**`[eventTime=0.26, mediaPos=0.00, window=0, period=0, true]`<br>
+ * `EventLogger:`**`tracks`**`[eventTime=2.22, mediaPos=0.00, window=0, period=0, []]`<br>
+ * `EventLogger:`**`isPlaying`**`[eventTime=2.37, mediaPos=0.00, window=0, period=0, true]`<br>
+
 ## How does ExoPlayer works under the hood
 
 
