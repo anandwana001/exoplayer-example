@@ -8,4 +8,5 @@
     <string name="basic_audio_player_with_smooth_streaming">Basic Audio Player with Smooth Streaming</string>
     <string name="basic_audio_player_with_hls_media_source">Basic Audio Player with HLS Media Source</string>
     <string name="basic_audio_player_with_progressive_media_source">Basic Audio Player with Progressive Media Source</string>
+    <string name="basic_audio_player_with_playlist">Basic Audio Player with Playlist</string>
 </resources>

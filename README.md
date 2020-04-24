@@ -71,6 +71,17 @@ Application thread for ExoPlayer instance must be use. Needed for ExoPlayer's UI
  * `EventLogger:`**`tracks`**`[eventTime=2.22, mediaPos=0.00, window=0, period=0, []]`<br>
  * `EventLogger:`**`isPlaying`**`[eventTime=2.37, mediaPos=0.00, window=0, period=0, true]`<br>
 
+## ConcatenatingMediaSource
+Helps to create heterogeneous playlist
+`ConcatenatingMediaSource(mediaSource1, mediaSource2, mediaSource1, mediaSource2)`
+
+Tags when item changes in playlist
+ * `Player.DISCONTINUITY_REASON_PERIOD_TRANSITION` - when automatically change from one item to next
+ * `Player.DISCONTINUITY_REASON_SEEK` - when call player.next
+ * `Player.TIMELINE_CHANGE_REASON_DYNAMIC` - when item added, removed or moved
+
+`getCurrentTag()` - To check which items in playling on the player.
+
 ## How does ExoPlayer works under the hood
 
 
