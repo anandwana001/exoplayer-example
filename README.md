@@ -96,6 +96,9 @@ Pass the loop count and this will loop the given media source that number of tim
 `ClippingMediaSource(mediaSource, 120000000, 150000000)`
 Pass the media source and start and end position in microseconds from where you have to clip the video.
 
+## ExoPlayer with Notification
+`BasicAudioPlayerWithNotification` here, I had added the Service to play audio when app is not visible to the user. It shows the media control in notificaiton panel. Screen has player view to control the playlist and also a text to show the title, description and image of the current playing song. Used `LiveData`.
+
 ## How does ExoPlayer works under the hood
 
 

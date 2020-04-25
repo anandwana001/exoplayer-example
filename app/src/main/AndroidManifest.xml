@@ -3,6 +3,7 @@
     package="com.akshay.exoplayerexample">
 
     <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <application
         android:allowBackup="true"
@@ -12,7 +13,7 @@
         android:supportsRtl="true"
         android:usesCleartextTraffic="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ui.BasicAudioPlayerWithClipLoopMerge">
+        <activity android:name=".ui.BasicAudioPlayerWithNotification">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -28,6 +29,9 @@
         <activity android:name=".ui.BasicAudioPlayerWithHLSMediaSource" />
         <activity android:name=".ui.BasicAudioPlayerWithProgressiveMediaSource" />
         <activity android:name=".ui.BasiAudioPlayerWithPlaylist" />
+        <activity android:name=".ui.BasicAudioPlayerWithClipLoopMerge" />
+
+        <service android:name=".util.AudioPlayerService" />
     </application>
 
 </manifest>
