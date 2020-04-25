@@ -96,11 +96,6 @@ Pass the loop count and this will loop the given media source that number of tim
 `ClippingMediaSource(mediaSource, 120000000, 150000000)`
 Pass the media source and start and end position in microseconds from where you have to clip the video.
 
-## ExoPlayer with Notification
-`BasicAudioPlayerWithNotification` here, I had added the Service to play audio when app is not visible to the user. It shows the media control in notificaiton panel. Screen has player view to control the playlist and also a text to show the title, description and image of the current playing song. Used `LiveData`.
-
-## How does ExoPlayer works under the hood
-
 
 ## What is DASH
 Dynamic Adaptive Streaming over HTTP (DASH) so what is Adaptive Streaming first?
@@ -132,3 +127,27 @@ HTTP Live Streaming by Apple, is a media streaming protocol to deliver content a
  * Master playlist - URLs to media playlists
  * Media playlist - URLs of the files (chunks) needed for streaming
 ![](https://miro.medium.com/max/1400/1*BSsL6uEf5UKLH_u7j0mckw.png)
+
+
+## Implementation
+
+### ExoPlayer with Notification
+`BasicAudioPlayerWithNotification` here, I had started a Service to play audio, also when app is not visible to the user, that is in background. It shows the media controls in notification panel. Screen has player view to control the playlist and also views to show the title, description and image of the current playing song. Used `LiveData`. Need to update.
+
+
+## Upcoming
+
+#### How does ExoPlayer works under the hood
+#### Service in Android
+#### MediaBrowserServiceCompat
+#### ExoPlayer in RecyclerView
+#### Custom UI
+#### Download Media
+#### Insert Ads
+#### DRM
+#### Error Handling
+#### Android Auto, Assistant and Wear
+#### Sample Music Player
+#### Sample Video Player
+#### Extension
+#### Surface View
