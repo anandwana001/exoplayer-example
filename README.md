@@ -135,10 +135,39 @@ HTTP Live Streaming by Apple, is a media streaming protocol to deliver content a
 `BasicAudioPlayerWithNotification` here, I had started a Service to play audio, also when app is not visible to the user, that is in background. It shows the media controls in notification panel. Screen has player view to control the playlist and also views to show the title, description and image of the current playing song. Used `LiveData`. Need to update.
 
 
+## Service in Android
+One of the Android Component. Other android component can start service and also bind with it to interact with it (IPC). Service runs in the main thread. It does not create its own thread. Recommended to create different and leaving main for user interaction. 
+
+Three typs of `service`
+ * Foreground - must have notification, user interaction
+ * Background - no user interaction
+ * Bound - calling `bindService()`, allows components to interact with the service. If unbind, serivce will destroy
+
+Important methods
+ * `startService()` - When any component wants to start a service
+ * `bindService()` - When any component wants to bind to a service for IPC, use of interface and return IBinder to component.
+ * `onCreate()` - system calls this to when service initiated
+ * `onDestroy()` - system calls when service destroy, must clean everything here
+ * `stopSelf()` - if any component started a service using `startService()`, it must stop with this method
+ 
+ `android:exported=fasle` - start your service by yourself and stop other to access it.
+ 
+ How system restart when service kills? 
+  * `START_NOT_STICKY` - If there are pending intents left, do no recreate
+  * `START_STICKY` - recreate the service, last result will be lost, suitable for media players
+  * `START_REDELIVER_INTENT` - recreate the service and deliver the last result
+
+Service can use the broadcast to deliver a result to component it started. `LocalBroadcastManager`
+
+Bound Service
+`ServiceConnection` - `onServiceConnected()` get called by system as soon as the connection gets done in client and service, after we bind the service `bindService()` and get the `IBinder` as an argument to communicate with service.
+
+Service Lifecycle<br>
+![](https://developer.android.com/images/service_lifecycle.png)
+
 ## Upcoming
 
 #### How does ExoPlayer works under the hood
-#### Service in Android
 #### MediaBrowserServiceCompat
 #### ExoPlayer in RecyclerView
 #### Custom UI
