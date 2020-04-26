@@ -7,7 +7,7 @@ import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.IBinder
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.graphics.drawable.toDrawable
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import com.akshay.exoplayerexample.R
 import com.akshay.exoplayerexample.util.AudioPlayerService
@@ -21,7 +21,6 @@ import kotlinx.android.synthetic.main.basic_audio_player_with_notification.*
 class BasicAudioPlayerWithNotification : AppCompatActivity() {
 
     private lateinit var intentService: Intent
-    private var bound = false
     private lateinit var serviceBinder: AudioPlayerService.AudioPlayerServiceBinder
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -36,14 +35,14 @@ class BasicAudioPlayerWithNotification : AppCompatActivity() {
     private val serviceConnector =
         object : ServiceConnection {
             override fun onServiceDisconnected(name: ComponentName?) {
-                bound = false
             }
 
             override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
                 if (service is AudioPlayerService.AudioPlayerServiceBinder) {
                     serviceBinder = service
-                    bound = true
-                    initPlayer()
+
+                    basic_audio_player_with_notification_player_view.player =
+                        serviceBinder.getSimpleExoPlayerInstance()
 
                     serviceBinder.getTitleLiveData()
                         .observe(this@BasicAudioPlayerWithNotification, Observer {
@@ -54,30 +53,20 @@ class BasicAudioPlayerWithNotification : AppCompatActivity() {
                         .observe(this@BasicAudioPlayerWithNotification, Observer {
 
                             basic_audio_player_with_notification_text_view_image_view.setImageDrawable(
-                               getDrawable(it)
+                                ContextCompat.getDrawable(this@BasicAudioPlayerWithNotification, it)
                             )
                         })
                 }
             }
-
         }
-
-    private fun initPlayer() {
-        if (bound) {
-            basic_audio_player_with_notification_player_view.player =
-                serviceBinder.getSimpleExoPlayerInstance()
-        }
-    }
 
     override fun onStart() {
         super.onStart()
         bindService(intentService, serviceConnector, Context.BIND_AUTO_CREATE)
-        initPlayer()
     }
 
     override fun onStop() {
         unbindService(serviceConnector)
-        bound = false
         super.onStop()
     }
 }

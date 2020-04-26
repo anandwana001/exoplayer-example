@@ -31,10 +31,6 @@ class AudioPlayerService : Service(), Player.EventListener {
     private var songDescriptionLiveData = MutableLiveData<String>()
     private var songIconLiveData = MutableLiveData<Int>()
 
-    private lateinit var local_notification : Notification
-    private var local_notificationId: Int = 0
-
-
     /**
      * ui part
      * notification cancel when null player pass or dismiss by user
@@ -48,12 +44,14 @@ class AudioPlayerService : Service(), Player.EventListener {
      * fast forward increment
      * notification icon
      */
-    private lateinit var playerNotificationManager: PlayerNotificationManager
+    private var playerNotificationManager: PlayerNotificationManager? = null
 
     private var binder = AudioPlayerServiceBinder()
 
     override fun onCreate() {
         super.onCreate()
+
+        startPlayer()
     }
 
     private fun startPlayer() {
@@ -69,7 +67,7 @@ class AudioPlayerService : Service(), Player.EventListener {
             )
         )
 
-        var concatenatingMediaSource = ConcatenatingMediaSource()
+        val concatenatingMediaSource = ConcatenatingMediaSource()
 
         for (sample in Constants.MP3_SAMPLE_PLAYLIST) {
             val progressiveMediaSource =
@@ -79,12 +77,12 @@ class AudioPlayerService : Service(), Player.EventListener {
         }
 
         simpleExoPlayer?.let {
+            it.addListener(this)
             it.prepare(concatenatingMediaSource)
             it.playWhenReady = true
         }
 
         setupNotification(context)
-        playerNotificationManager.setPlayer(simpleExoPlayer)
     }
 
     private fun setupNotification(context: AudioPlayerService) {
@@ -127,33 +125,44 @@ class AudioPlayerService : Service(), Player.EventListener {
                             Constants.MP3_SAMPLE_PLAYLIST[player.currentWindowIndex].bitmapResource
                         )
                     }
-
                 },
-                object : PlayerNotificationManager.NotificationListener {
-
-                    override fun onNotificationCancelled(
-                        notificationId: Int,
-                        dismissedByUser: Boolean
-                    ) {
-                        stopSelf()
-                    }
-
-                    override fun onNotificationPosted(
-                        notificationId: Int,
-                        notification: Notification,
-                        ongoing: Boolean
-                    ) {
-                        local_notification = notification
-                        local_notificationId = notificationId
-                        startForeground(notificationId, notification)
-                    }
-                }
+                playerNotificationListener
             )
+        playerNotificationManager?.setPlayer(simpleExoPlayer)
     }
+
+    private var playerNotificationListener: PlayerNotificationManager.NotificationListener? =
+        object : PlayerNotificationManager.NotificationListener {
+
+            override fun onNotificationCancelled(
+                notificationId: Int,
+                dismissedByUser: Boolean
+            ) {
+                stopSelf()
+            }
+
+            override fun onNotificationPosted(
+                notificationId: Int,
+                notification: Notification,
+                ongoing: Boolean
+            ) {
+                if (ongoing) {
+                    startForeground(notificationId, notification)
+                } else {
+                    stopForeground(false)
+                }
+
+            }
+        }
 
     override fun onDestroy() {
         simpleExoPlayer?.let {
-            playerNotificationManager.setPlayer(null)
+            playerNotificationManager?.let {
+                it.setPlayer(null)
+                playerNotificationListener = null
+                playerNotificationManager = null
+            }
+            it.removeListener(this)
             it.release()
             simpleExoPlayer = null
         }
@@ -175,17 +184,12 @@ class AudioPlayerService : Service(), Player.EventListener {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        if (simpleExoPlayer == null) {
-            startPlayer()
-        }
-        return START_NOT_STICKY
+        return super.onStartCommand(intent, flags, startId)
     }
 
     override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
-        if(!playWhenReady){
+        /*if (!playWhenReady) {
             stopForeground(true)
-        } else {
-            startForeground(local_notificationId, local_notification)
-        }
+        }*/
     }
 }
