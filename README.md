@@ -134,6 +134,11 @@ HTTP Live Streaming by Apple, is a media streaming protocol to deliver content a
 ### ExoPlayer with Notification
 `BasicAudioPlayerWithNotification` here, I had started a Service to play audio, also when app is not visible to the user, that is in background. It shows the media controls in notification panel. Screen has player view to control the playlist and also views to show the title, description and image of the current playing song. Used `LiveData`. Need to update.
 
+## Screenshot 📱
+<p float="left">
+<img src="https://github.com/anandwana001/exoplayer-example/blob/master/screenshot/main_screen.png" width="200" height="400" />
+<img src="https://github.com/anandwana001/exoplayer-example/blob/master/screenshot/notification.png" width="200" height="400" />
+</p>
 
 ## Service in Android
 One of the Android Component. Other android component can start service and also bind with it to interact with it (IPC). Service runs in the main thread. It does not create its own thread. Recommended to create different and leaving main for user interaction. 
