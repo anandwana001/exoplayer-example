@@ -2,45 +2,47 @@ package com.akshay.exoplayerexample.ui
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import com.akshay.exoplayerexample.databinding.BasicAudioPlayerBinding
-import com.akshay.exoplayerexample.databinding.BasicAudioPlayerWithClipLoopMergeBinding
+import com.akshay.exoplayerexample.R
 import com.akshay.exoplayerexample.util.Constants
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
+import com.google.android.exoplayer2.Player
+import com.google.android.exoplayer2.source.ConcatenatingMediaSource
 import com.google.android.exoplayer2.source.MediaSource
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSource
 import com.google.android.exoplayer2.util.Util
+import kotlinx.android.synthetic.main.basic_audio_player_with_playlist.*
 
 /**
  * Created by akshaynandwana on
- * 22, April, 2020
+ * 24, April, 2020
  **/
-
-class BasicAudioPlayer : AppCompatActivity() {
+class BasicMediaPlayerWithPlaylist : AppCompatActivity() {
 
     // STEP 1: create a ExoPlayer instance
     private var exoPlayer: ExoPlayer? = null
+    private lateinit var exoPlayerListener: ExoPlayerListener
 
     private var playPauseState = true
     private var currentWindow = 0
     private var playbackPosition = 0L
 
-    private val viewBinding by lazy(LazyThreadSafetyMode.NONE) {
-        BasicAudioPlayerWithClipLoopMergeBinding.inflate(layoutInflater)
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(viewBinding.root)
+        setContentView(R.layout.basic_audio_player_with_playlist)
+
+        exoPlayerListener = ExoPlayerListener()
     }
 
     // STEP 2: initialize the ExoPlayer
     private fun initializeExoPlayer() {
         exoPlayer = ExoPlayer.Builder(this).build()
         exoPlayer?.let {
-            viewBinding.basicAudioPlayerWithClipLoopMergePlayerView.player = exoPlayer
-            val mediaSource = buildMediaSource(Constants.MP3_URL)
+            it.addListener(exoPlayerListener)
+            basic_audio_player_with_playlist_player_view.player = exoPlayer
+            // pass multiple file url
+            val mediaSource = buildMediaSource(Constants.MP3_URL, Constants.MP4_URL)
             it.setMediaSource(mediaSource)
             it.playWhenReady = playPauseState
             it.seekTo(currentWindow, playbackPosition)
@@ -48,28 +50,41 @@ class BasicAudioPlayer : AppCompatActivity() {
         }
     }
 
-    /**
-     * Media Source List: ProgressiveMediaSource,
-     * DashMediaSource, SsMediaSource, HlsMediaSource,
-     * ConcatenatingMediaSource, ClippingMediaSource, LoopingMediaSource, MergingMediaSource
-     */
-    // STEP 3: creating a Media Source of our requirements
-    private fun buildMediaSource(url: String): MediaSource {
+    // creating a ConcatenatingMediaSource
+    private fun buildMediaSource(url1: String, url2: String): MediaSource {
+
         val dataSourceFactory = DefaultHttpDataSource.Factory()
-        return ProgressiveMediaSource.Factory(
-            dataSourceFactory
-        ).createMediaSource(MediaItem.fromUri(Constants.uriParser(url)))
+
+        val mediaSource1 = ProgressiveMediaSource.Factory(dataSourceFactory)
+
+            .createMediaSource(MediaItem.fromUri(Constants.uriParser(url1)))
+
+        val mediaSource2 = ProgressiveMediaSource.Factory(dataSourceFactory)
+            .createMediaSource(MediaItem.fromUri(Constants.uriParser(url2)))
+
+        // Heterogeneous Playlist
+        return ConcatenatingMediaSource(mediaSource1, mediaSource2, mediaSource1, mediaSource2)
     }
 
     // STEP 4: release the player when not needed
     private fun releasePlayer() {
         exoPlayer?.run {
+            removeListener(exoPlayerListener)
             playbackPosition = this.currentPosition
             currentWindow = this.currentMediaItemIndex
             playPauseState = this.playWhenReady
             release()
         }
         exoPlayer = null
+    }
+
+
+    inner class ExoPlayerListener : Player.Listener {
+
+        override fun onPositionDiscontinuity(reason: Int) {
+            basic_audio_player_with_playlist_text_view.text =
+                "reason = ${reason}"
+        }
     }
 
     // STEP 5: using OnLifecycleEvent annotations to work with activity lifecycle callbacks

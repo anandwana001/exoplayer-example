@@ -3,17 +3,14 @@ package com.akshay.exoplayerexample.ui
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleObserver
-import androidx.lifecycle.OnLifecycleEvent
-import com.akshay.exoplayerexample.R
+import com.akshay.exoplayerexample.databinding.BasicAudioPlayerWithListenerBinding
 import com.akshay.exoplayerexample.util.Constants
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.source.MediaSource
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.source.TrackGroupArray
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray
-import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
+import com.google.android.exoplayer2.upstream.DefaultDataSource
 import com.google.android.exoplayer2.util.EventLogger
 import com.google.android.exoplayer2.util.Util
 import kotlinx.android.synthetic.main.basic_audio_player_with_listener.*
@@ -24,70 +21,74 @@ import kotlinx.android.synthetic.main.basic_audio_player_with_listener.*
  **/
 class BasicAudioPlayerWithListener : AppCompatActivity() {
 
-    private var simpleExoPlayer: SimpleExoPlayer? = null
+    // STEP 1: create a ExoPlayer instance
+    private var exoPlayer: ExoPlayer? = null
 
     // create listener instance
     private lateinit var exoPlayerListener: ExoPlayerListener
     private lateinit var eventLogger: EventLogger
 
-    private var playWhenReady = true
+    private var playPauseState = true
     private var currentWindow = 0
-    private var playbackPosition: Long = 0
+    private var playbackPosition = 0L
+
+    private val viewBinding by lazy(LazyThreadSafetyMode.NONE) {
+        BasicAudioPlayerWithListenerBinding.inflate(layoutInflater)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.basic_audio_player_with_listener)
-
-        lifecycle.addObserver(ExoplayerObserver())
+        setContentView(viewBinding.root)
 
         // initialise listener
         exoPlayerListener = ExoPlayerListener()
         eventLogger = EventLogger(null)
     }
 
+    // STEP 2: initialize the ExoPlayer
     private fun initializeExoPlayer() {
-        simpleExoPlayer = SimpleExoPlayer.Builder(this).build()
-        simpleExoPlayer?.let {
-            basic_audio_player_with_listener_player_view.player = simpleExoPlayer
+        exoPlayer = ExoPlayer.Builder(this).build()
+        exoPlayer?.let {
+            viewBinding.basicAudioPlayerWithListenerPlayerView.player = exoPlayer
+            val mediaSource = buildMediaSource(Constants.MP3_URL)
+            it.setMediaSource(mediaSource)
+            it.playWhenReady = playPauseState
+            it.seekTo(currentWindow, playbackPosition)
 
             // add listener
             it.addListener(exoPlayerListener)
-
             // add log listener
             it.addAnalyticsListener(eventLogger)
-
-            val mediaSource = buildMediaSource(Constants.MP3_URL)
-            it.setPlayWhenReady(playWhenReady)
-            it.seekTo(currentWindow, playbackPosition)
-            it.prepare(mediaSource, false, false)
+            it.prepare()
         }
     }
 
     private fun buildMediaSource(url: String): MediaSource {
-        val dataSourceFactory = DefaultDataSourceFactory(this, "basic_audio_player")
+        val dataSourceFactory = DefaultDataSource.Factory(this)
         return ProgressiveMediaSource.Factory(
             dataSourceFactory
-        ).createMediaSource(Constants.uriParser(url))
+        ).createMediaSource(MediaItem.fromUri(Constants.uriParser(url)))
     }
 
+    // STEP 4: release the player when not needed
     private fun releasePlayer() {
-        simpleExoPlayer?.let {
+        exoPlayer?.run {
 
             // remove listener
-            it.removeListener(exoPlayerListener)
+            this.removeListener(exoPlayerListener)
 
             // remove log listener
-            it.removeAnalyticsListener(eventLogger)
+            this.removeAnalyticsListener(eventLogger)
 
-            playWhenReady = it.getPlayWhenReady()
-            playbackPosition = it.getCurrentPosition()
-            currentWindow = it.getCurrentWindowIndex()
-            it.release()
-            simpleExoPlayer = null
+            playbackPosition = this.currentPosition
+            currentWindow = this.currentMediaItemIndex
+            playPauseState = this.playWhenReady
+            release()
         }
+        exoPlayer = null
     }
 
-    inner class ExoPlayerListener : Player.EventListener {
+    inner class ExoPlayerListener : Player.Listener {
 
         override fun onPlaybackParametersChanged(playbackParameters: PlaybackParameters) {
             super.onPlaybackParametersChanged(playbackParameters)
@@ -102,10 +103,6 @@ class BasicAudioPlayerWithListener : AppCompatActivity() {
             trackSelections: TrackSelectionArray
         ) {
             super.onTracksChanged(trackGroups, trackSelections)
-        }
-
-        override fun onPlayerError(error: ExoPlaybackException) {
-            super.onPlayerError(error)
         }
 
         override fun onLoadingChanged(isLoading: Boolean) {
@@ -132,17 +129,14 @@ class BasicAudioPlayerWithListener : AppCompatActivity() {
             super.onTimelineChanged(timeline, reason)
         }
 
-        override fun onTimelineChanged(timeline: Timeline, manifest: Any?, reason: Int) {
-            super.onTimelineChanged(timeline, manifest, reason)
-        }
-
         override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
             when (playbackState) {
                 ExoPlayer.STATE_IDLE -> {
                     basic_audio_player_with_listener_progress_view_text_view.text = "STATE_IDLE"
                 }
                 ExoPlayer.STATE_BUFFERING -> {
-                    basic_audio_player_with_listener_progress_view_text_view.text = "STATE_BUFFERING"
+                    basic_audio_player_with_listener_progress_view_text_view.text =
+                        "STATE_BUFFERING"
                     basic_audio_player_with_listener_progress_view.visibility = View.VISIBLE
                 }
                 ExoPlayer.STATE_READY -> {
@@ -163,34 +157,38 @@ class BasicAudioPlayerWithListener : AppCompatActivity() {
         }
     }
 
-    inner class ExoplayerObserver : LifecycleObserver {
+    // STEP 5: using OnLifecycleEvent annotations to work with activity lifecycle callbacks
 
-        @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
-        fun onResume() {
-            if ((Util.SDK_INT < 24 || simpleExoPlayer == null)) {
-                initializeExoPlayer()
-            }
+    /**
+     * Checking API level 24, as 24 and above android supports multi window.
+     * We can modify our player on the basis of the activity lifecycle by initialising
+     * or releasing the player. onResume and onPause.
+     */
+    override fun onStart() {
+        super.onStart()
+        if (Util.SDK_INT >= 24) {
+            initializeExoPlayer()
         }
+    }
 
-        @OnLifecycleEvent(Lifecycle.Event.ON_START)
-        fun onStart() {
-            if (Util.SDK_INT >= 24) {
-                initializeExoPlayer()
-            }
+    override fun onResume() {
+        super.onResume()
+        if ((Util.SDK_INT < 24 || exoPlayer == null)) {
+            initializeExoPlayer()
         }
+    }
 
-        @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
-        fun onStop() {
-            if (Util.SDK_INT >= 24) {
-                releasePlayer()
-            }
+    override fun onPause() {
+        super.onPause()
+        if (Util.SDK_INT < 24) {
+            releasePlayer()
         }
+    }
 
-        @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
-        fun onPause() {
-            if (Util.SDK_INT < 24) {
-                releasePlayer()
-            }
+    override fun onStop() {
+        super.onStop()
+        if (Util.SDK_INT >= 24) {
+            releasePlayer()
         }
     }
 }

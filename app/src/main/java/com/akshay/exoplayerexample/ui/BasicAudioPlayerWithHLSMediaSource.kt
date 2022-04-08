@@ -2,18 +2,16 @@ package com.akshay.exoplayerexample.ui
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleObserver
-import androidx.lifecycle.OnLifecycleEvent
-import com.akshay.exoplayerexample.R
+import com.akshay.exoplayerexample.databinding.BasicAudioPlayerWithHlsMediaSourceBinding
 import com.akshay.exoplayerexample.util.Constants
+import com.google.android.exoplayer2.ExoPlayer
+import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
-import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.Timeline
 import com.google.android.exoplayer2.source.MediaSource
 import com.google.android.exoplayer2.source.hls.HlsManifest
 import com.google.android.exoplayer2.source.hls.HlsMediaSource
-import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory
+import com.google.android.exoplayer2.upstream.DefaultHttpDataSource
 import com.google.android.exoplayer2.util.Util
 import kotlinx.android.synthetic.main.basic_audio_player_with_hls_media_source.*
 
@@ -23,33 +21,34 @@ import kotlinx.android.synthetic.main.basic_audio_player_with_hls_media_source.*
  **/
 class BasicAudioPlayerWithHLSMediaSource : AppCompatActivity() {
 
-    private var simpleExoPlayer: SimpleExoPlayer? = null
+    // STEP 1: create a ExoPlayer instance
+    private var exoPlayer: ExoPlayer? = null
     private lateinit var exoPlayerListener: ExoPlayerListener
 
-    private var playWhenReady = true
+    private var playPauseState = true
     private var currentWindow = 0
-    private var playbackPosition: Long = 0
+    private var playbackPosition = 0L
+
+    private val viewBinding by lazy(LazyThreadSafetyMode.NONE) {
+        BasicAudioPlayerWithHlsMediaSourceBinding.inflate(layoutInflater)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.basic_audio_player_with_hls_media_source)
-
-        lifecycle.addObserver(ExoplayerObserver())
+        setContentView(viewBinding.root)
         exoPlayerListener = ExoPlayerListener()
     }
 
+    // STEP 2: initialize the ExoPlayer
     private fun initializeExoPlayer() {
-        simpleExoPlayer = SimpleExoPlayer.Builder(this).build()
-        simpleExoPlayer?.let {
-            basic_audio_player_with_hls_media_source_player_view.player = simpleExoPlayer
-            it.addListener(exoPlayerListener)
-
-            // pass HLS file url
+        exoPlayer = ExoPlayer.Builder(this).build()
+        exoPlayer?.let {
+            viewBinding.basicAudioPlayerWithHlsMediaSourcePlayerView.player = exoPlayer
             val mediaSource = buildMediaSource(Constants.HLS_URL)
-
-            it.setPlayWhenReady(playWhenReady)
+            it.setMediaSource(mediaSource)
+            it.playWhenReady = playPauseState
             it.seekTo(currentWindow, playbackPosition)
-            it.prepare(mediaSource, false, false)
+            it.prepare()
         }
     }
 
@@ -57,8 +56,7 @@ class BasicAudioPlayerWithHLSMediaSource : AppCompatActivity() {
     private fun buildMediaSource(url: String): MediaSource {
 
         // using DefaultHttpDataSourceFactory for http data source
-        val dataSourceFactory =
-            DefaultHttpDataSourceFactory(Util.getUserAgent(this, "exoplayer-example"))
+        val dataSourceFactory = DefaultHttpDataSource.Factory()
 
         // Set a custom authentication request header
         // dataSourceFactory.setDefaultRequestProperty("Header", "Value")
@@ -67,24 +65,24 @@ class BasicAudioPlayerWithHLSMediaSource : AppCompatActivity() {
 
         // create HLS Media Source
         return HlsMediaSource.Factory(dataSourceFactory)
-            .createMediaSource(Constants.uriParser(url))
+            .createMediaSource(MediaItem.fromUri(Constants.uriParser(url)))
     }
 
+    // STEP 4: release the player when not needed
     private fun releasePlayer() {
-        simpleExoPlayer?.let {
-            it.removeListener(exoPlayerListener)
-            playWhenReady = it.getPlayWhenReady()
-            playbackPosition = it.getCurrentPosition()
-            currentWindow = it.getCurrentWindowIndex()
-            it.release()
-            simpleExoPlayer = null
+        exoPlayer?.run {
+            playbackPosition = this.currentPosition
+            currentWindow = this.currentMediaItemIndex
+            playPauseState = this.playWhenReady
+            release()
         }
+        exoPlayer = null
     }
 
-    inner class ExoPlayerListener : Player.EventListener {
+    inner class ExoPlayerListener : Player.Listener {
         override fun onTimelineChanged(timeline: Timeline, reason: Int) {
 
-            simpleExoPlayer?.let {
+            exoPlayer?.let {
                 val manifest = it.currentManifest
                 manifest?.let {
                     val hlsManifest = it as HlsManifest
@@ -95,34 +93,38 @@ class BasicAudioPlayerWithHLSMediaSource : AppCompatActivity() {
         }
     }
 
-    inner class ExoplayerObserver : LifecycleObserver {
+    // STEP 5: using OnLifecycleEvent annotations to work with activity lifecycle callbacks
 
-        @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
-        fun onResume() {
-            if ((Util.SDK_INT < 24 || simpleExoPlayer == null)) {
-                initializeExoPlayer()
-            }
+    /**
+     * Checking API level 24, as 24 and above android supports multi window.
+     * We can modify our player on the basis of the activity lifecycle by initialising
+     * or releasing the player. onResume and onPause.
+     */
+    override fun onStart() {
+        super.onStart()
+        if (Util.SDK_INT >= 24) {
+            initializeExoPlayer()
         }
+    }
 
-        @OnLifecycleEvent(Lifecycle.Event.ON_START)
-        fun onStart() {
-            if (Util.SDK_INT >= 24) {
-                initializeExoPlayer()
-            }
+    override fun onResume() {
+        super.onResume()
+        if ((Util.SDK_INT < 24 || exoPlayer == null)) {
+            initializeExoPlayer()
         }
+    }
 
-        @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
-        fun onStop() {
-            if (Util.SDK_INT >= 24) {
-                releasePlayer()
-            }
+    override fun onPause() {
+        super.onPause()
+        if (Util.SDK_INT < 24) {
+            releasePlayer()
         }
+    }
 
-        @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
-        fun onPause() {
-            if (Util.SDK_INT < 24) {
-                releasePlayer()
-            }
+    override fun onStop() {
+        super.onStop()
+        if (Util.SDK_INT >= 24) {
+            releasePlayer()
         }
     }
 }

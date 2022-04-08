@@ -6,7 +6,7 @@ import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
 import androidx.annotation.DrawableRes
 import com.akshay.exoplayerexample.R
-import com.akshay.exoplayerexample.Sample
+import com.akshay.exoplayerexample.data.Media
 
 
 /**
@@ -49,21 +49,21 @@ object Constants {
         "http://www.storiesinflight.com/js_videosub/jellies.srt"
 
     val MP3_SAMPLE_PLAYLIST = arrayOf(
-        Sample(
+        Media(
             uriParser("https://storage.googleapis.com/automotive-media/Jazz_In_Paris.mp3"),
             "audio_1",
             "Jazz in Paris",
             "Jazz for the masses",
             R.drawable.goku
         ),
-        Sample(
+        Media(
             uriParser("https://storage.googleapis.com/automotive-media/The_Messenger.mp3"),
             "audio_2",
             "The messenger",
             "Hipster guide to London",
             R.drawable.goku_second
         ),
-        Sample(
+        Media(
             uriParser("https://storage.googleapis.com/automotive-media/Talkies.mp3"),
             "audio_3",
             "Talkies",

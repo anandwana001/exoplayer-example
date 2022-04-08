@@ -29,7 +29,6 @@ class BasicAudioPlayerWithNotification : AppCompatActivity() {
 
         intentService = Intent(this, AudioPlayerService::class.java)
         Util.startForegroundService(this, intentService)
-
     }
 
     private val serviceConnector =

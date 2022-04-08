@@ -2,45 +2,51 @@ package com.akshay.exoplayerexample.ui
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import com.akshay.exoplayerexample.databinding.BasicAudioPlayerBinding
-import com.akshay.exoplayerexample.databinding.BasicAudioPlayerWithClipLoopMergeBinding
+import com.akshay.exoplayerexample.databinding.BasicAudioPlayerWithSmoothStreamingBinding
 import com.akshay.exoplayerexample.util.Constants
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
+import com.google.android.exoplayer2.Player
+import com.google.android.exoplayer2.Timeline
 import com.google.android.exoplayer2.source.MediaSource
-import com.google.android.exoplayer2.source.ProgressiveMediaSource
+import com.google.android.exoplayer2.source.smoothstreaming.SsMediaSource
+import com.google.android.exoplayer2.source.smoothstreaming.manifest.SsManifest
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSource
 import com.google.android.exoplayer2.util.Util
+import kotlinx.android.synthetic.main.basic_audio_player_with_smooth_streaming.*
 
 /**
  * Created by akshaynandwana on
- * 22, April, 2020
+ * 24, April, 2020
  **/
-
-class BasicAudioPlayer : AppCompatActivity() {
+class BasicVideoPlayerWithSmoothStreaming : AppCompatActivity() {
 
     // STEP 1: create a ExoPlayer instance
     private var exoPlayer: ExoPlayer? = null
+    private lateinit var exoPlayerListener: ExoPlayerListener
 
     private var playPauseState = true
     private var currentWindow = 0
     private var playbackPosition = 0L
 
     private val viewBinding by lazy(LazyThreadSafetyMode.NONE) {
-        BasicAudioPlayerWithClipLoopMergeBinding.inflate(layoutInflater)
+        BasicAudioPlayerWithSmoothStreamingBinding.inflate(layoutInflater)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(viewBinding.root)
+
+        exoPlayerListener = ExoPlayerListener()
     }
 
     // STEP 2: initialize the ExoPlayer
     private fun initializeExoPlayer() {
         exoPlayer = ExoPlayer.Builder(this).build()
         exoPlayer?.let {
-            viewBinding.basicAudioPlayerWithClipLoopMergePlayerView.player = exoPlayer
-            val mediaSource = buildMediaSource(Constants.MP3_URL)
+            viewBinding.basicAudioPlayerWithSmoothStreamingPlayerView.player = exoPlayer
+            it.addListener(exoPlayerListener)
+            val mediaSource = buildMediaSource(Constants.SMOOTH_STREAM_URL)
             it.setMediaSource(mediaSource)
             it.playWhenReady = playPauseState
             it.seekTo(currentWindow, playbackPosition)
@@ -48,28 +54,38 @@ class BasicAudioPlayer : AppCompatActivity() {
         }
     }
 
-    /**
-     * Media Source List: ProgressiveMediaSource,
-     * DashMediaSource, SsMediaSource, HlsMediaSource,
-     * ConcatenatingMediaSource, ClippingMediaSource, LoopingMediaSource, MergingMediaSource
-     */
-    // STEP 3: creating a Media Source of our requirements
     private fun buildMediaSource(url: String): MediaSource {
+
         val dataSourceFactory = DefaultHttpDataSource.Factory()
-        return ProgressiveMediaSource.Factory(
-            dataSourceFactory
-        ).createMediaSource(MediaItem.fromUri(Constants.uriParser(url)))
+
+        // smooth stream media source
+        return SsMediaSource.Factory(dataSourceFactory)
+            .createMediaSource(MediaItem.fromUri(Constants.uriParser(url)))
     }
 
     // STEP 4: release the player when not needed
     private fun releasePlayer() {
         exoPlayer?.run {
+            removeListener(exoPlayerListener)
             playbackPosition = this.currentPosition
             currentWindow = this.currentMediaItemIndex
             playPauseState = this.playWhenReady
             release()
         }
         exoPlayer = null
+    }
+
+    inner class ExoPlayerListener : Player.Listener {
+        override fun onTimelineChanged(timeline: Timeline, reason: Int) {
+            exoPlayer?.let {
+                val manifest = it.currentManifest
+                manifest?.let {
+                    val smoothStreamManifest = it as SsManifest
+                    basic_audio_player_with_smooth_streaming_text_view.text =
+                        "durationUs = ${smoothStreamManifest.durationUs} \n dvrWindowLengthUs = ${smoothStreamManifest.dvrWindowLengthUs} \n isLive = ${smoothStreamManifest.isLive} \n lookAheadCount = ${smoothStreamManifest.lookAheadCount} \n majorVersion = ${smoothStreamManifest.majorVersion} \n minorVersion = ${smoothStreamManifest.minorVersion} \n protectionElement = ${smoothStreamManifest.protectionElement} \n streamElements = ${smoothStreamManifest.streamElements}"
+                }
+            }
+        }
     }
 
     // STEP 5: using OnLifecycleEvent annotations to work with activity lifecycle callbacks
